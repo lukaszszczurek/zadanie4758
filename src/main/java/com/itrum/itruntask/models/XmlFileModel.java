@@ -1,10 +1,7 @@
 package com.itrum.itruntask.models;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -12,13 +9,13 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table
-public class ikki {
+@Table(name = "external")
+public class XmlFileModel {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private String id;
     @Column(name = "data")
     private String data;
-
 }

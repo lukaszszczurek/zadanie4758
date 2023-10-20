@@ -15,6 +15,8 @@ public class XmlService {
 
     public  String result()
     {
-        return xmlFileRepository.findAll().toString();
+        var data = xmlFileRepository.findAll();
+        var w = data.get(0);
+        return w.getData();
     }
 }

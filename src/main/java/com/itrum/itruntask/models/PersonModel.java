@@ -1,5 +1,6 @@
 package com.itrum.itruntask.models;
 
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,6 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PersonModel {
 
-    @XmlTransient
     private String personId;
     private String firstName;
     private String lastName;

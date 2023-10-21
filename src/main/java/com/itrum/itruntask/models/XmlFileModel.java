@@ -13,7 +13,6 @@ import lombok.*;
 public class XmlFileModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private String id;
     @Column(name = "data")

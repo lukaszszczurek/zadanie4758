@@ -43,4 +43,25 @@ public class XmlService {
 
 
     }
+
+
+    public void addPerson(PersonModel person) throws JAXBException {
+        JAXBContext ctx = JAXBContext.newInstance(PersonModel.class);
+        Marshaller marshaller = ctx.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+       // PersonModel product = new PersonModel("1", "Jan", "kowal", "43333", "5@.plp", "PESEL");
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(person, sw);
+        String xmlString = sw.toString();
+        System.out.println(xmlString);
+
+        XmlFileModel xmlFileModel = new XmlFileModel();
+        xmlFileModel.setId("1212");
+        xmlFileModel.setData(xmlString);
+
+        System.out.println(xmlFileModel.toString());
+        xmlFileRepository.save(xmlFileModel);
+
+    }
 }

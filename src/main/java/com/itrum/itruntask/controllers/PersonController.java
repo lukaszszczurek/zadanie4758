@@ -1,5 +1,7 @@
 package com.itrum.itruntask.controllers;
 
+import com.itrum.itruntask.models.PersonModel;
+import com.itrum.itruntask.models.XmlFileModel;
 import com.itrum.itruntask.repositories.IXmlFileRepository;
 import com.itrum.itruntask.services.PersonService;
 import com.itrum.itruntask.services.XmlService;
@@ -12,9 +14,9 @@ import java.util.List;
 @RequestMapping("/person/api")
 public class PersonController {
 
-    private final XmlService xmlSaervice;
-    public PersonController( IXmlFileRepository xmlFileRepository, XmlService xmlSaervice, PersonService personService1) {
-        this.xmlSaervice = xmlSaervice;
+    private final XmlService xmlService;
+    public PersonController(IXmlFileRepository xmlFileRepository, XmlService xmlService, PersonService personService1) {
+        this.xmlService = xmlService;
 
     }
 
@@ -29,6 +31,18 @@ public class PersonController {
 
     @GetMapping
     public List<String> getPerson() throws JAXBException {
-        return xmlSaervice.result();
+        return xmlService.result();
+    }
+
+    @PostMapping
+    public void addPerson(@RequestBody PersonModel person) throws JAXBException {
+        XmlFileModel xmlFileModel = new XmlFileModel();
+        System.out.println(xmlFileModel.getId() + " ---->");
+        xmlFileModel.setData(person.toString());
+        System.out.println(xmlFileModel.toString());
+        System.out.println("XDDDDDDDDDD");
+        System.out.println(person.toString());
+
+        xmlService.addPerson(person);
     }
 }

@@ -5,6 +5,9 @@ import com.itrum.itruntask.services.PersonService;
 import com.itrum.itruntask.services.XmlService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.bind.JAXBException;
+import java.util.List;
+
 @RestController
 @RequestMapping("/person/api")
 public class PersonController {
@@ -22,8 +25,10 @@ public class PersonController {
     }
 
 
+
+
     @GetMapping
-    public String getPerson() {
+    public List<String> getPerson() throws JAXBException {
         return xmlSaervice.result();
     }
 }

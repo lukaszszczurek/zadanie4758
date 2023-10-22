@@ -53,3 +53,7 @@ Person {
     String pesel
 
 }
+
+
+*Problem
+- nie wiem czy mogę jakoś uniknąć duplikacji kodu te servisy podobnie wyglądają, ale nie wiem jak to poprawić za bardzo -> mogę to zmienić dodając metode w klasie modelu albo jakoś brzydko w metodzie servisu. Tam kmina jest czy tych ifów w kontrollerze nie zmienić

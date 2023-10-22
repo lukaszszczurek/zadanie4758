@@ -4,13 +4,21 @@ import com.itrum.itruntask.models.PersonModel;
 import com.itrum.itruntask.models.XmlFileModel;
 import com.itrum.itruntask.repositories.IXmlFileRepository;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.sql.rowset.spi.XmlReader;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.awt.print.Book;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
@@ -56,26 +64,8 @@ public class XmlService {
         return xmlFileRepository.findAll().stream().map(XmlFileModel::getData).collect(Collectors.toList());
     }
 
-    public String getPersonByEmail(String email) throws JAXBException {
+    public String getPersonByEmail(String email) throws JAXBException, ParserConfigurationException, IOException, SAXException {
 
-//        List<XmlFileModel> xmlFileModels = xmlFileRepository.findAll();
-//        // set all xmlFilemodels.data to personModel
-//        // filter personModel by email
-//        // return personModel
-//
-//      //  String x = "<PersonModel><personId>123</personId><firstName>John</firstName><lastName>Doe</lastName><mobile>123-456-7890</mobile><email>john.doe@example.com</email><pesel>12345678901</pesel></PersonModel>";
-//        // x to personModel
-//        // personModel.getEmail().equals(email)
-//
-//        JAXBContext ctx = JAXBContext.newInstance(PersonModel.class);
-//        Unmarshaller marshaller =  ctx.createUnmarshaller();
-//        StringReader reader = new StringReader(xmlFileModels.get(0).getData());
-//        PersonModel personModel = (PersonModel) marshaller.unmarshal(reader);
-//        if (personModel.getEmail().equals(email)) {
-//            return personModel.toString();
-//        }
-//        return "not found";
-//    }
         String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<person>\n" +
                 "    <personId>5422321</personId>\n" +
@@ -87,22 +77,35 @@ public class XmlService {
                 "</person>";
 
 
-        System.out.println(xmlString);
-
          var xmlString2 = xmlFileRepository.findAll().get(0).getData();
+
+
+
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+        xmlString2 = xml.trim().replaceFirst("^([\\W]+)<","<");
+        Document doc = builder.parse(new InputSource(new StringReader(xmlString2)));
+
+        System.out.println("--doc-->" + doc.toString());
 
         JAXBContext jaxbContext = JAXBContext.newInstance(PersonModel.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        System.out.println("--ok-->" + unmarshaller);
 
-        StringReader reader = new StringReader(xmlString2);
-        PersonModel person = (PersonModel) unmarshaller.unmarshal(reader);
+        StringReader reader = new StringReader(doc.toString());
+        PersonModel person = (PersonModel) unmarshaller
+                .unmarshal(reader);
+
+        System.out.println("--person-->" + person);
 
         System.out.println(person);
+        List<String> list = xmlFileRepository.findAll().stream().map(XmlFileModel::getData).collect(Collectors.toList());
 
-        return "h1";
+        return list.toString();
 
     }
-
-
 
     }

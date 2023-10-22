@@ -67,17 +67,26 @@ public class XmlService {
     public String getPersonByEmail(String email) throws JAXBException, ParserConfigurationException, IOException, SAXException {
         // Pobierz XML z bazy danych
         String xmlString2 = xmlFileRepository.findAll().get(0).getData();
+        List<String> xmlData = xmlFileRepository.findAll().stream().map(XmlFileModel::getData).toList();
+        var getPersonByEmail = xmlData.stream().filter(x-> getPersonFromXML(x).getEmail().equals(email)).toList();
+        System.out.println("--ENG-->" + getPersonByEmail);
 
-        System.out.println("--xmlString2-->" + xmlString2);
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        return getPersonByEmail.toString();
+
+    }
+
+
+    public PersonModel getPersonFromXML(String xmlData)
+    {
 
         try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
             DocumentBuilder builder = factory.newDocumentBuilder();
             // Usuń niepotrzebny fragment XML z deklaracją XML
-            xmlString2 = xmlString2.trim().replaceFirst("^([\\W]+)<", "<");
-            Document doc = builder.parse(new InputSource(new StringReader(xmlString2)));
+            xmlData = xmlData.trim().replaceFirst("^([\\W]+)<", "<");
+            Document doc = builder.parse(new InputSource(new StringReader(xmlData)));
 
             System.out.println("--doc-->" + doc.toString());
 
@@ -85,19 +94,19 @@ public class XmlService {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
             // Utwórz reader z dokumentu XML
-            StringReader reader = new StringReader(xmlString2);
+            StringReader reader = new StringReader(xmlData);
             PersonModel person = (PersonModel) unmarshaller.unmarshal(reader);
 
             System.out.println("--person-->" + person);
 
-            // Reszta kodu
-            List<String> list = xmlFileRepository.findAll().stream().map(XmlFileModel::getData).collect(Collectors.toList());
+            System.out.println("--person-->" + person.getEmail());
+            System.out.println("--person-->" + person.getFirstName());
 
-            return list.toString();
+            return person;
         } catch (Exception e) {
             e.printStackTrace();
             // Obsłuż wyjątki, które mogą wystąpić podczas przetwarzania XML
-            return "Błąd analizy XML: " + e.getMessage();
+           throw new RuntimeException("Person not found");
         }
     }
 

@@ -1,14 +1,14 @@
 package com.itrum.itruntask.services;
 
-import com.itrum.itruntask.repositories.IXmlFileRepository;
+import com.itrum.itruntask.repositories.ExternalPersonXmlRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PersonService {
 
-    private final IXmlFileRepository xmlFileRepository;
+    private final ExternalPersonXmlRepository xmlFileRepository;
 
-    public PersonService(IXmlFileRepository xmlFileRepository) {
+    public PersonService(ExternalPersonXmlRepository xmlFileRepository) {
         this.xmlFileRepository = xmlFileRepository;
     }
 

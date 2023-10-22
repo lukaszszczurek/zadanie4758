@@ -10,7 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @Table(name = "external")
-public class XmlFileModel {
+public class ExternalPersonXmlModel {
 
     @Id
     @Column(name = "id")

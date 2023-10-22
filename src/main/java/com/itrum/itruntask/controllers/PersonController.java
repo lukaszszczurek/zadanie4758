@@ -1,14 +1,10 @@
 package com.itrum.itruntask.controllers;
 
 import com.itrum.itruntask.models.PersonModel;
-import com.itrum.itruntask.models.XmlFileModel;
-import com.itrum.itruntask.repositories.IXmlFileRepository;
-import com.itrum.itruntask.services.PersonService;
 import com.itrum.itruntask.services.XmlService;
 import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
 
-import javax.sql.rowset.spi.XmlReader;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -29,7 +25,7 @@ public class PersonController {
 
     @GetMapping("XD/{email}")
     public String getPersonByEmail(@PathVariable String email) throws JAXBException, ParserConfigurationException, IOException, SAXException {
-        return xmlService.getPersonByEmail(email);
+        return xmlService.getPersonByMobile(email);
     }
 
     @GetMapping

@@ -1,15 +1,13 @@
 package com.itrum.itruntask.services;
 
 import com.itrum.itruntask.models.PersonModel;
-import com.itrum.itruntask.models.XmlFileModel;
-import com.itrum.itruntask.repositories.IXmlFileRepository;
+import com.itrum.itruntask.models.ExternalPersonXmlModel;
+import com.itrum.itruntask.repositories.ExternalPersonXmlRepository;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.sql.rowset.spi.XmlReader;
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -17,7 +15,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.print.Book;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -27,9 +24,9 @@ import java.util.stream.Collectors;
 @Service
 public class XmlService {
 
-    private final IXmlFileRepository xmlFileRepository;
+    private final ExternalPersonXmlRepository xmlFileRepository;
 
-    public XmlService(IXmlFileRepository xmlFileRepository) {
+    public XmlService(ExternalPersonXmlRepository xmlFileRepository) {
         this.xmlFileRepository = xmlFileRepository;
     }
 
@@ -52,29 +49,43 @@ public class XmlService {
         StringWriter sw = new StringWriter();
         marshaller.marshal(person, sw);
         String xmlString = sw.toString();
-        XmlFileModel xmlFileModel = new XmlFileModel();
-        xmlFileModel.setId(person.getPersonId());
-        xmlFileModel.setData(xmlString);
+        ExternalPersonXmlModel externalPersonXmlModel = new ExternalPersonXmlModel();
+        externalPersonXmlModel.setId(person.getPersonId());
+        externalPersonXmlModel.setData(xmlString);
 
-        xmlFileRepository.save(xmlFileModel);
+        xmlFileRepository.save(externalPersonXmlModel);
 
     }
 
     public List<String> getAllPeople() {
-        return xmlFileRepository.findAll().stream().map(XmlFileModel::getData).collect(Collectors.toList());
+        return xmlFileRepository.findAll().stream().map(ExternalPersonXmlModel::getData).collect(Collectors.toList());
     }
 
-    public String getPersonByEmail(String email) throws JAXBException, ParserConfigurationException, IOException, SAXException {
+    public String getPersonByType(String tableName)
+    {
+        return tableName;
+    }
+
+    public String getPersonByMobile(String mobile) throws JAXBException, ParserConfigurationException, IOException, SAXException {
+        List<String> xmlData = xmlFileRepository.findAll().stream().map(ExternalPersonXmlModel::getData).toList();
+        var getPersonByMobile = xmlData.stream().filter(x-> getPersonFromXML(x).getMobile().equals(mobile)).toList();
+        System.out.println("--ENG-->" + getPersonByMobile);
+
+
+        return getPersonByMobile.toString();
+
+    }
+
+    public String getPersonByFirstName(String firstName) throws JAXBException, ParserConfigurationException, IOException, SAXException {
         // Pobierz XML z bazy danych
-        String xmlString2 = xmlFileRepository.findAll().get(0).getData();
-        List<String> xmlData = xmlFileRepository.findAll().stream().map(XmlFileModel::getData).toList();
-        var getPersonByEmail = xmlData.stream().filter(x-> getPersonFromXML(x).getEmail().equals(email)).toList();
-        System.out.println("--ENG-->" + getPersonByEmail);
+        List<String> xmlData = xmlFileRepository.findAll().stream().map(ExternalPersonXmlModel::getData).toList();
+        var getPersonByFirstName = xmlData.stream().filter(x -> getPersonFromXML(x).getFirstName().equals(firstName)).toList();
+        System.out.println("--ENG-->" + getPersonByFirstName);
 
-
-        return getPersonByEmail.toString();
-
+        return getPersonByFirstName.toString();
     }
+
+
 
 
     public PersonModel getPersonFromXML(String xmlData)
@@ -109,6 +120,7 @@ public class XmlService {
            throw new RuntimeException("Person not found");
         }
     }
+
 
 
 }

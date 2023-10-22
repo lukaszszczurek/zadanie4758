@@ -12,7 +12,6 @@ public class PersonService {
         this.xmlFileRepository = xmlFileRepository;
     }
 
-
     public String getAllPeople() {
         return xmlFileRepository.findAll().toString();
     }

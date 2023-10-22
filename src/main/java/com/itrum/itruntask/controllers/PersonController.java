@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/person/api")
+@RequestMapping("/person/api/")
 public class PersonController {
 
     private final ExternalPersonXmlService externalPersonXmlService;
@@ -24,41 +24,82 @@ public class PersonController {
     }
     @GetMapping("{tableName}/{id}")
     public String getPersonById(@PathVariable String tableName,@PathVariable String id) throws JAXBException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return serviceManager(tableName).getClass()
-                .getMethod("getPersonById", String.class)
-                .invoke(serviceManager(tableName), id).toString();
+
+       if(tableName.equals("internal")){
+           return internalPersonXmlService.getPersonById(id);
+       }
+       else if(tableName.equals("external")){
+           return externalPersonXmlService.getPersonById(id);
+       }
+       else{
+           return "Wrong table name";
+       }
     }
 
-    @GetMapping("{tableName}/{email}")
+    @GetMapping("{tableName}/email/{email}")
     public String getPersonByEmail(@PathVariable String tableName,@PathVariable String email) throws JAXBException, ParserConfigurationException, IOException, SAXException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return serviceManager(tableName).getClass()
-                .getMethod("getPersonByEmail", String.class)
-                .invoke(serviceManager(tableName), email).toString();
+      if (tableName.equals("internal")){
+          return internalPersonXmlService.getPersonByEmail(email);
+      }
+      else if(tableName.equals("external")){
+          return externalPersonXmlService.getPersonByEmail(email);
+      }
+      else{
+          return "Wrong table name";
+      }
     }
 
-    @GetMapping
-    public List<String> getAllPeople() {
-        return externalPersonXmlService.getAllPeople();
+    @GetMapping("{tableName}/mobile/{mobile}")
+    public String getPersonByMobile(@PathVariable String tableName,@PathVariable String mobile) throws JAXBException, ParserConfigurationException, IOException, SAXException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (tableName.equals("internal")){
+            return internalPersonXmlService.getPersonByMobile(mobile);
+        }
+        else if(tableName.equals("external")){
+            return externalPersonXmlService.getPersonByMobile(mobile);
+        }
+        else{
+            return "Wrong table name";
+        }
+    }
+
+
+    @GetMapping("{tableName}/name/{name}")
+    public String getPersonByName(@PathVariable String tableName,@PathVariable String name) throws JAXBException, ParserConfigurationException, IOException, SAXException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (tableName.equals("internal")){
+            return internalPersonXmlService.getPersonByFirstName(name);
+        }
+        else if(tableName.equals("external")){
+            return externalPersonXmlService.getPersonByFirstName(name);
+        }
+        else{
+            return "Wrong table name";
+        }
+    }
+
+    @GetMapping("{tableName}")
+    public List<String> getAllPeople(@PathVariable String tableName){
+
+        if (tableName.equals("internal")){
+            return internalPersonXmlService.getAllPeople();
+        }
+        else if(tableName.equals("external")){
+            return externalPersonXmlService.getAllPeople();
+        }
+        else{
+            throw new RuntimeException("Wrong table name");
+        }
     }
 
     @PostMapping("/{tableName}")
     public void addPerson(@PathVariable String tableName,@RequestBody PersonModel person) throws JAXBException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        serviceManager(tableName).getClass()
-                .getMethod("addPerson", PersonModel.class)
-                .invoke(serviceManager(tableName), person);
-    }
-
-    // manager
-
-    public <T> T serviceManager(String tableName) throws JAXBException {
-        if(tableName.equals("internal")){
-            return (T) internalPersonXmlService;
-        }
-        else if(tableName.equals("external")){
-            return (T) externalPersonXmlService;
-        }
-        else{
-            throw new RuntimeException("Table not found");
-        }
+       if (tableName.equals("internal")){
+                internalPersonXmlService.addPerson(person);
+            }
+            else if(tableName.equals("external")){
+                externalPersonXmlService.addPerson(person);
+            }
+            else{
+                System.out.println("Wrong table name");
+            }
     }
 }

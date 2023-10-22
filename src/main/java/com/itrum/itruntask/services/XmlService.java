@@ -65,47 +65,41 @@ public class XmlService {
     }
 
     public String getPersonByEmail(String email) throws JAXBException, ParserConfigurationException, IOException, SAXException {
+        // Pobierz XML z bazy danych
+        String xmlString2 = xmlFileRepository.findAll().get(0).getData();
 
-        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<person>\n" +
-                "    <personId>5422321</personId>\n" +
-                "    <firstName>Jane</firstName>\n" +
-                "    <lastName>Smith</lastName>\n" +
-                "    <mobile>987-654-3210</mobile>\n" +
-                "    <email>janesmith@example.com</email>\n" +
-                "    <pesel>98765432109</pesel>\n" +
-                "</person>";
-
-
-         var xmlString2 = xmlFileRepository.findAll().get(0).getData();
-
-
-
+        System.out.println("--xmlString2-->" + xmlString2);
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-        xmlString2 = xml.trim().replaceFirst("^([\\W]+)<","<");
-        Document doc = builder.parse(new InputSource(new StringReader(xmlString2)));
 
-        System.out.println("--doc-->" + doc.toString());
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            // Usuń niepotrzebny fragment XML z deklaracją XML
+            xmlString2 = xmlString2.trim().replaceFirst("^([\\W]+)<", "<");
+            Document doc = builder.parse(new InputSource(new StringReader(xmlString2)));
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(PersonModel.class);
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        System.out.println("--ok-->" + unmarshaller);
+            System.out.println("--doc-->" + doc.toString());
 
-        StringReader reader = new StringReader(doc.toString());
-        PersonModel person = (PersonModel) unmarshaller
-                .unmarshal(reader);
+            JAXBContext jaxbContext = JAXBContext.newInstance(PersonModel.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-        System.out.println("--person-->" + person);
+            // Utwórz reader z dokumentu XML
+            StringReader reader = new StringReader(xmlString2);
+            PersonModel person = (PersonModel) unmarshaller.unmarshal(reader);
 
-        System.out.println(person);
-        List<String> list = xmlFileRepository.findAll().stream().map(XmlFileModel::getData).collect(Collectors.toList());
+            System.out.println("--person-->" + person);
 
-        return list.toString();
+            // Reszta kodu
+            List<String> list = xmlFileRepository.findAll().stream().map(XmlFileModel::getData).collect(Collectors.toList());
 
+            return list.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Obsłuż wyjątki, które mogą wystąpić podczas przetwarzania XML
+            return "Błąd analizy XML: " + e.getMessage();
+        }
     }
 
-    }
+
+}

@@ -3,6 +3,7 @@ package com.itrum.itruntask.services;
 import com.itrum.itruntask.models.PersonModel;
 import com.itrum.itruntask.models.ExternalPersonXmlModel;
 import com.itrum.itruntask.repositories.ExternalPersonXmlRepository;
+import com.itrum.itruntask.repositories.InternalPersonXmlRepository;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -22,17 +23,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class XmlService {
+public class ExternalPersonXmlService {
 
-    private final ExternalPersonXmlRepository xmlFileRepository;
+    private final ExternalPersonXmlRepository externalPersonXmlRepository;
 
-    public XmlService(ExternalPersonXmlRepository xmlFileRepository) {
-        this.xmlFileRepository = xmlFileRepository;
+    public ExternalPersonXmlService(ExternalPersonXmlRepository externalPersonXmlRepository, InternalPersonXmlRepository internalPersonXmlRepository) {
+        this.externalPersonXmlRepository = externalPersonXmlRepository;
     }
 
     public String getPersonById(String id) {
 
-        var data = xmlFileRepository.findById(id).get().getData();
+        var data = externalPersonXmlRepository.findById(id).get().getData();
         if (data == null) {
             throw new RuntimeException("Person not found");
         }
@@ -53,12 +54,12 @@ public class XmlService {
         externalPersonXmlModel.setId(person.getPersonId());
         externalPersonXmlModel.setData(xmlString);
 
-        xmlFileRepository.save(externalPersonXmlModel);
+        externalPersonXmlRepository.save(externalPersonXmlModel);
 
     }
 
     public List<String> getAllPeople() {
-        return xmlFileRepository.findAll().stream().map(ExternalPersonXmlModel::getData).collect(Collectors.toList());
+        return externalPersonXmlRepository.findAll().stream().map(ExternalPersonXmlModel::getData).collect(Collectors.toList());
     }
 
     public String getPersonByType(String tableName)
@@ -67,7 +68,7 @@ public class XmlService {
     }
 
     public String getPersonByMobile(String mobile) throws JAXBException, ParserConfigurationException, IOException, SAXException {
-        List<String> xmlData = xmlFileRepository.findAll().stream().map(ExternalPersonXmlModel::getData).toList();
+        List<String> xmlData = externalPersonXmlRepository.findAll().stream().map(ExternalPersonXmlModel::getData).toList();
         var getPersonByMobile = xmlData.stream().filter(x-> getPersonFromXML(x).getMobile().equals(mobile)).toList();
         System.out.println("--ENG-->" + getPersonByMobile);
 
@@ -78,7 +79,7 @@ public class XmlService {
 
     public String getPersonByFirstName(String firstName) throws JAXBException, ParserConfigurationException, IOException, SAXException {
         // Pobierz XML z bazy danych
-        List<String> xmlData = xmlFileRepository.findAll().stream().map(ExternalPersonXmlModel::getData).toList();
+        List<String> xmlData = externalPersonXmlRepository.findAll().stream().map(ExternalPersonXmlModel::getData).toList();
         var getPersonByFirstName = xmlData.stream().filter(x -> getPersonFromXML(x).getFirstName().equals(firstName)).toList();
         System.out.println("--ENG-->" + getPersonByFirstName);
 
